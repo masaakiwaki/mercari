@@ -18,9 +18,10 @@ if os.path.isfile('/app/.chromedriver/bin/chromedriver'):
     options.add_argument('--disable-dev-shm-usage')
     driver = webdriver.Chrome(drivepath, options=options)
 
-### webdirver config (local setting windows) ###    
+### webdirver config (local setting windows) ###
 elif os.path.isfile(os.path.join(os.path.dirname(os.path.abspath('__file__')), ('chromedriver.exe'))):
-    drivepath = os.path.join(os.path.dirname(os.path.abspath('__file__')), ('chromedriver.exe'))
+    drivepath = os.path.join(os.path.dirname(
+        os.path.abspath('__file__')), ('chromedriver.exe'))
     options = webdriver.ChromeOptions()
     driver = webdriver.Chrome(drivepath, options=options)
 
@@ -76,7 +77,16 @@ class Item_Detail():
         self.info_number = ''
         self.find_tag = ''
 
-    driver.get('https://www.mercari.com/jp/items/m80585751959/')
+    driver.get('https://www.mercari.com/jp/items/m28554804613/')
+
+    def screen_capture(self):
+        page_width = driver.execute_script('return document.body.scrollWidth')
+        page_height = driver.execute_script(
+            'return document.body.scrollHeight')
+        driver.set_window_size(page_width, page_height)
+        capture_name = File_Name('screen.png')
+        driver.save_screenshot(capture_name)
+        return
 
     def get_html(self):
         html = driver.page_source.encode('utf-8')
@@ -119,26 +129,25 @@ class Item_Detail():
 
     def detail_categorys_list(self):
         info = self.detail_information()
-        list = []
+        list_object = []
         for i in info:
             i = i.select("th")
-            list.append(i[0].get_text())
-        return list
+        list_object.append(i[0].get_text())
+        return list_object
 
     def detail_contents(self, info_number, find_tag):
-        list = []
+        list_object = []
         info = self.detail_information()
         i = info[info_number].select(find_tag)
         for i in i:
             i = i.get_text()
             i = i.replace('\n', '')  # 　delete indention
             i = i.replace(' ', '')  # 　delete space
-            list.append(i)
-        return list
+            list_object.append(i)
+        return list_object
 
     def detail_contents_list(self):
-        list = []
-        list
+        list_object = []
 
         user_list = []
         '''information user name'''
@@ -146,55 +155,56 @@ class Item_Detail():
 
         '''information user valuation'''
         user_list.append(self.detail_contents(0, 'span'))
-        list.append(user_list)
+        list_object.append(user_list)
 
         '''information category name'''
-        list.append(self.detail_contents(1, 'div'))
+        list_object.append(self.detail_contents(1, 'div'))
 
         '''information category brand'''
-        list.append(self.detail_contents(2, 'div'))
+        list_object.append(self.detail_contents(2, 'div'))
 
         '''information category status'''
-        list.append(self.detail_contents(3, 'td'))
+        list_object.append(self.detail_contents(3, 'td'))
 
         '''information category shipping'''
-        list.append(self.detail_contents(4, 'td'))
+        list_object.append(self.detail_contents(4, 'td'))
 
         '''information category shipping method'''
-        list.append(self.detail_contents(5, 'td'))
+        list_object.append(self.detail_contents(5, 'td'))
 
         '''information category shipping method'''
-        list.append(self.detail_contents(6, 'td'))
+        list_object.append(self.detail_contents(6, 'td'))
 
         '''information category shipping day'''
-        list.append(self.detail_contents(7, 'td'))
+        list_object.append(self.detail_contents(7, 'td'))
+        return list_object
 
-        return list
+    def flatten(self, l):
+        import collections
+        for el in l:
+            if isinstance(el, collections.abc.Iterable) and not isinstance(el, (str, bytes)):
+                yield from self.flatten(el)
+            else:
+                yield el
 
+    def create_csv(self):
+        list_heder = ['タイトル', 'ヘッダー', '本文', '価格', '税区分', '送料', 'いいね', '出品者', '高評価', '低評価',
+                      'カテゴリー1', 'カテゴリー2', 'カテゴリー3', 'ブランド', '商品の状態', '配送料の負担', '配送の方法', '配送元地域', '発送日の目安']
 
-a = Item_Detail()
+        list_object = []
+        list_object.append(self.detail_title())
+        list_object.append(self.detail_heder())
+        list_object.append(self.detail_text())
+        list_object.append(self.detail_price())
+        list_object.append(self.detail_like())
+        list_object.append(self.detail_contents_list())
+        list_object = list(self.flatten(list_object))
 
-a.detail_title()
-
-a.detail_heder()
-
-a.detail_text()
-
-a.detail_price()
-
-a.detail_like()
-
-a.detail_categorys_list()
-
-a.detail_contents_list()
-
-
-# screen capture
-page_width = driver.execute_script('return document.body.scrollWidth')
-page_height = driver.execute_script('return document.body.scrollHeight')
-driver.set_window_size(page_width, page_height)
-capture_name = File_Name('screen.png')
-driver.save_screenshot(capture_name)
+        with open("detail.csv", "w", encoding="utf-8") as f:  # 文字コードをShift_JISに指定
+            # writerオブジェクトの作成 改行記号で行を区切る
+            writer = csv.writer(f, lineterminator="\n")
+            writer.writerow(list_heder)  # csvファイルに書き込み
+            writer.writerow(list_object)  # csvファイルに書き込み
 
 
 def Scraping(request):
