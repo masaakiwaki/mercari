@@ -7,14 +7,22 @@ import datetime
 import pytz
 import csv
 import re
-import pandas as pd
+
 
 # webdirver config (colaboratory only)
-options = webdriver.ChromeOptions()
-options.add_argument('--headless')
-options.add_argument('--no-sandbox')
-options.add_argument('--disable-dev-shm-usage')
-driver = webdriver.Chrome('chromedriver', options=options)
+if os.path.isfile('/app/.chromedriver/bin/chromedriver'):
+    drivepath = '/app/.chromedriver/bin/chromedriver'
+    options = webdriver.ChromeOptions()
+    options.add_argument('--headless')
+    options.add_argument('--no-sandbox')
+    options.add_argument('--disable-dev-shm-usage')
+    driver = webdriver.Chrome(drivepath, options=options)
+
+### webdirver config (local setting windows) ###    
+elif os.path.isfile(os.path.join(os.path.dirname(os.path.abspath('__file__')), ('chromedriver.exe'))):
+    drivepath = os.path.join(os.path.dirname(os.path.abspath('__file__')), ('chromedriver.exe'))
+    options = webdriver.ChromeOptions()
+    driver = webdriver.Chrome(drivepath, options=options)
 
 # create file_name (now data,time)
 
@@ -200,3 +208,7 @@ def Scraping(request):
         'htmltest': bottest[0],
     }
     return render(request, 'bot/index.html', content)
+
+
+if __name__ == "__main__":
+    main()
