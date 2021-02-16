@@ -75,15 +75,11 @@ print(url)
 
 
 class Item_Detail():
-    def __init__(self):
-        self.url = ''
-
-    driver.get('https://www.mercari.com/jp/items/m28554804613/')
-
-    def get_html(self):
+    def __init__(self, url):
+        self.url = url
+        driver.get(self.url)
         html = driver.page_source.encode('utf-8')
-        soup = BeautifulSoup(html, 'lxml')
-        return soup
+        self.soup = BeautifulSoup(html, 'lxml')
 
     def screen_capture(self):
         page_width = driver.execute_script('return document.body.scrollWidth')
@@ -96,22 +92,22 @@ class Item_Detail():
         return
 
     def detail_title(self):
-        i = self.get_html().select("[class='item-name']")
+        i = self.soup.select("[class='item-name']")
         i = i[0].get_text()
         return i
 
     def detail_heder(self):
-        i = self.get_html().select("[class='item-wording']")
+        i = self.soup.select("[class='item-wording']")
         i = i[0].get_text()
         return i
 
     def detail_text(self):
-        i = self.get_html().select("[class='item-description-inner']")
+        i = self.soup.select("[class='item-description-inner']")
         i = i[0].get_text()
         return i
 
     def detail_price(self):
-        i = self.get_html().select("[class='item-price-box text-center']")
+        i = self.soup.select("[class='item-price-box text-center']")
         price = i[0].select("span")
         list = []
         for i in price:
@@ -119,13 +115,13 @@ class Item_Detail():
         return list
 
     def detail_like(self):
-        i = self.get_html().select("[data-num='like']")
+        i = self.soup.select("[data-num='like']")
         i = i[0].get_text()
         return i
 
     def detail_information(self):
         '''information all'''
-        i = self.get_html().select("[class='item-detail-table']")
+        i = self.soup.select("[class='item-detail-table']")
         i = i[0].select("tr")
         return i
 
@@ -213,7 +209,8 @@ class Item_Detail():
 
 def Scraping(request):
     global list_object
-    a = Item_Detail()
+    a = Item_Detail('https://www.mercari.com/jp/items/m28554804613/')
+
     a.screen_capture()
     list_object = a.create_csv()
     dict_object = dict(zip(list_object[0], list_object[1]))
@@ -226,7 +223,28 @@ def Scraping(request):
         'message': fdt_now + '時点のメルカリ出品詳細です。',
         'detail_dict': dict_object,
     }
-    driver.close()
+
+    return render(request, 'crawling/index.html', content)
+
+
+def Scraping_Find(request, *args, **kwargs):
+    global list_object
+    url = request.GET.get("url")
+    a = Item_Detail(url)
+
+    a.screen_capture()
+    list_object = a.create_csv()
+    dict_object = dict(zip(list_object[0], list_object[1]))
+
+    dt_now = datetime.datetime.now(pytz.timezone('Asia/Tokyo'))
+    fdt_now = dt_now.strftime(
+        '%Y' + '年' + '%m' + '月' + '%d' + '日' + '%H' + '時' + '%M' + '分' + '%S' + '秒')
+
+    content = {
+        'message': fdt_now + '時点のメルカリ出品詳細です。',
+        'detail_dict': dict_object,
+    }
+
     return render(request, 'crawling/index.html', content)
 
 

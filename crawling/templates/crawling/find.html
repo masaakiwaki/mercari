@@ -1,13 +1,14 @@
 {% extends "base.html" %}
 {% block main %}
 
-<form action="{% url 'find' %}" method="get">
+<form action="/find" method="post">
+    {% csrf_token %}
     <div>
-      <label for="name">メルカリ商品詳細URL</label>
+      <label for="name">url</label>
       <input type="text" id="url" name="url">
     </div>
 
-    <input type="submit" value="リスト化">
+    <input type="submit" value="送信する">
   </form>
 
 
