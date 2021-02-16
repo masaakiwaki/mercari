@@ -19,11 +19,12 @@
         <div class="col"  style="background-color: #f0f8ff;">
             <div class="table-responsive">
                 <table class="table table-hover border-bottom">
-                {% for html in htmltest %}
-
-                <tr><td>{{ html }}</td></tr>
-
-                {% endfor %}
+                    
+                        {% for key,value in detail_dict.items %}
+                        <tr><td>{{ key }}</td><td>{{ value }}</td></tr>
+                        {% endfor %}
+                    
+                    
                 </table>
             </div>
         </div>

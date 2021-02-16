@@ -36,12 +36,13 @@ def File_Name(output_name):
     return file_name
 
 
+'''
 dt_now = datetime.datetime.now(pytz.timezone('Asia/Tokyo'))
 fdt_now = dt_now.strftime('%Y%m%d%H%M%S')
 file_name = os.path.dirname(os.path.abspath('__file__'))
 print(file_name)
 
-'''Generate　URL'''
+
 
 
 def search_url(keyword='not_keyword'):
@@ -70,6 +71,7 @@ print(links)
 url = [s.replace('/jp/items/m', 'https://www.mercari.com/jp/items/m')
        for s in links]
 print(url)
+'''
 
 
 class Item_Detail():
@@ -84,7 +86,8 @@ class Item_Detail():
         page_height = driver.execute_script(
             'return document.body.scrollHeight')
         driver.set_window_size(page_width, page_height)
-        capture_name = File_Name('screen.png')
+        #capture_name = File_Name('screen.png')
+        capture_name = 'media/screen.png'
         driver.save_screenshot(capture_name)
         return
 
@@ -206,18 +209,38 @@ class Item_Detail():
             writer.writerow(list_heder)  # csvファイルに書き込み
             writer.writerow(list_object)  # csvファイルに書き込み
 
+        return list_heder, list_object
+
 
 def Scraping(request):
-    global bottest
+    global list_object
+    a = Item_Detail()
+    a.screen_capture()
+    list_object = a.create_csv()
+    dict_object = dict(zip(list_object[0], list_object[1]))
+
     dt_now = datetime.datetime.now(pytz.timezone('Asia/Tokyo'))
     fdt_now = dt_now.strftime(
         '%Y' + '年' + '%m' + '月' + '%d' + '日' + '%H' + '時' + '%M' + '分' + '%S' + '秒')
-    bottest = Create_List()
+
     content = {
         'message': fdt_now + '時点のYahoo Japanトップページのニュース一覧です。',
-        'htmltest': bottest[0],
+        'detail_dict': dict_object,
     }
-    return render(request, 'bot/index.html', content)
+    driver.close()
+    return render(request, 'crawling/index.html', content)
+
+
+def Download_List(request):
+    # レスポンスの設定
+    csv_object = [list_object[0], list_object[1]]
+    response = HttpResponse(content_type='text/csv')
+    filename = 'YahooNewsList.csv'  # ダウンロードするcsvファイル名
+    response['Content-Disposition'] = 'attachment; filename={}'.format(
+        filename)
+    writer = csv.writer(response)
+    writer.writerows(csv_object)
+    return response
 
 
 if __name__ == "__main__":
