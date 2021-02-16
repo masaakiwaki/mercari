@@ -75,11 +75,10 @@ print(url)
 
 
 class Item_Detail():
-    def __init__(self):
-        self.info_number = ''
-        self.find_tag = ''
+    def __init__(self, url):
+        self.url = ''
 
-    driver.get('https://www.mercari.com/jp/items/m28554804613/')
+        driver.get(self.url)
 
     def screen_capture(self):
         page_width = driver.execute_script('return document.body.scrollWidth')
@@ -214,7 +213,7 @@ class Item_Detail():
 
 def Scraping(request):
     global list_object
-    a = Item_Detail()
+    a = Item_Detail('https://www.mercari.com/jp/items/m28554804613/')
     a.screen_capture()
     list_object = a.create_csv()
     dict_object = dict(zip(list_object[0], list_object[1]))
@@ -224,7 +223,7 @@ def Scraping(request):
         '%Y' + '年' + '%m' + '月' + '%d' + '日' + '%H' + '時' + '%M' + '分' + '%S' + '秒')
 
     content = {
-        'message': fdt_now + '時点のYahoo Japanトップページのニュース一覧です。',
+        'message': fdt_now + '時点のメルカリ出品詳細です。',
         'detail_dict': dict_object,
     }
     driver.close()
