@@ -75,10 +75,15 @@ print(url)
 
 
 class Item_Detail():
-    def __init__(self, url):
+    def __init__(self):
         self.url = ''
 
-        driver.get(self.url)
+    driver.get('https://www.mercari.com/jp/items/m28554804613/')
+
+    def get_html(self):
+        html = driver.page_source.encode('utf-8')
+        soup = BeautifulSoup(html, 'lxml')
+        return soup
 
     def screen_capture(self):
         page_width = driver.execute_script('return document.body.scrollWidth')
@@ -89,11 +94,6 @@ class Item_Detail():
         capture_name = 'media/screen.png'
         driver.save_screenshot(capture_name)
         return
-
-    def get_html(self):
-        html = driver.page_source.encode('utf-8')
-        soup = BeautifulSoup(html, 'lxml')
-        return soup
 
     def detail_title(self):
         i = self.get_html().select("[class='item-name']")
@@ -213,7 +213,7 @@ class Item_Detail():
 
 def Scraping(request):
     global list_object
-    a = Item_Detail('https://www.mercari.com/jp/items/m28554804613/')
+    a = Item_Detail()
     a.screen_capture()
     list_object = a.create_csv()
     dict_object = dict(zip(list_object[0], list_object[1]))
