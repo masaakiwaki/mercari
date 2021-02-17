@@ -16,7 +16,6 @@ if os.path.isfile('/app/.chromedriver/bin/chromedriver'):
     options.add_argument('--headless')
     options.add_argument('--no-sandbox')
     options.add_argument('--disable-dev-shm-usage')
-    driver = webdriver.Chrome(drivepath, options=options)
 
 ### webdirver config (local setting windows) ###
 elif os.path.isfile(os.path.join(os.path.dirname(os.path.abspath('__file__')), ('chromedriver.exe'))):
