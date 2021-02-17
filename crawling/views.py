@@ -23,7 +23,7 @@ elif os.path.isfile(os.path.join(os.path.dirname(os.path.abspath('__file__')), (
     drivepath = os.path.join(os.path.dirname(
         os.path.abspath('__file__')), ('chromedriver.exe'))
     options = webdriver.ChromeOptions()
-    driver = webdriver.Chrome(drivepath, options=options)
+
 
 # create file_name (now data,time)
 
@@ -76,7 +76,9 @@ print(url)
 
 class Item_Detail():
     def __init__(self, url):
+        global driver
         self.url = url
+        driver = webdriver.Chrome(drivepath, options=options)
         driver.get(self.url)
         html = driver.page_source.encode('utf-8')
         self.soup = BeautifulSoup(html, 'lxml')
@@ -229,6 +231,7 @@ def Scraping(request):
 
 def Scraping_Find(request, *args, **kwargs):
     global list_object
+    driver.close()
     url = request.GET.get("url")
     a = Item_Detail(url)
 
