@@ -9,19 +9,32 @@ import csv
 import re
 
 
-# webdirver config (colaboratory only)
+### webdirver config (heroku) ###
 if os.path.isfile('/app/.chromedriver/bin/chromedriver'):
+    print('setup Heroku')
     drivepath = '/app/.chromedriver/bin/chromedriver'
     options = webdriver.ChromeOptions()
     options.add_argument('--headless')
     options.add_argument('--no-sandbox')
     options.add_argument('--disable-dev-shm-usage')
+    driver = webdriver.Chrome(drivepath, options=options)
 
 ### webdirver config (local setting windows) ###
 elif os.path.isfile(os.path.join(os.path.dirname(os.path.abspath('__file__')), ('chromedriver.exe'))):
+    print('setup Windows')
     drivepath = os.path.join(os.path.dirname(
         os.path.abspath('__file__')), ('chromedriver.exe'))
     options = webdriver.ChromeOptions()
+    driver = webdriver.Chrome(drivepath, options=options)
+
+### webdirver config (Colaboratory) ###
+elif os.path.isfile('/usr/bin/chromedriver'):
+    print('setup Colaboratory')
+    drivepath = 'chromedriver'
+    options = webdriver.ChromeOptions()
+    options.add_argument('--headless')
+    options.add_argument('--no-sandbox')
+    options.add_argument('--disable-dev-shm-usage')
 
 
 # create file_name (now data,time)
@@ -78,6 +91,7 @@ class Item_Detail():
         global driver
         self.url = url
         driver = webdriver.Chrome(drivepath, options=options)
+        driver.implicitly_wait(3)
         driver.get(self.url)
         html = driver.page_source.encode('utf-8')
         self.soup = BeautifulSoup(html, 'lxml')
