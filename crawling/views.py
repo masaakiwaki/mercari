@@ -268,7 +268,7 @@ def Download_List(request):
     # レスポンスの設定
     csv_object = [list_object[0], list_object[1]]
     response = HttpResponse(content_type='text/csv')
-    filename = 'YahooNewsList.csv'  # ダウンロードするcsvファイル名
+    filename = 'MerukariItemList.csv'  # ダウンロードするcsvファイル名
     response['Content-Disposition'] = 'attachment; filename={}'.format(
         filename)
     writer = csv.writer(response)
