@@ -246,10 +246,10 @@ def Scraping_Find(request, *args, **kwargs):
     global list_object
     driver.close()
     url = request.GET.get("url")
-    a = Item_Detail(url)
+    b = Item_Detail(url)
 
-    a.screen_capture()
-    list_object = a.create_csv()
+    b.screen_capture()
+    list_object = b.create_csv()
     dict_object = dict(zip(list_object[0], list_object[1]))
 
     dt_now = datetime.datetime.now(pytz.timezone('Asia/Tokyo'))
