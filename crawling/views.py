@@ -25,7 +25,7 @@ elif os.path.isfile(os.path.join(os.path.dirname(os.path.abspath('__file__')), (
     drivepath = os.path.join(os.path.dirname(
         os.path.abspath('__file__')), ('chromedriver.exe'))
     options = webdriver.ChromeOptions()
-    driver = webdriver.Chrome(drivepath, options=options)
+
 
 ### webdirver config (Colaboratory) ###
 elif os.path.isfile('/usr/bin/chromedriver'):
@@ -88,6 +88,10 @@ print(url)
 
 class Item_Detail():
     def __init__(self, url):
+
+        print(datetime.datetime.now(pytz.timezone('Asia/Tokyo')))
+        print('インスタンス化しました。')
+
         global driver
         self.url = url
         driver = webdriver.Chrome(drivepath, options=options)
@@ -221,6 +225,11 @@ class Item_Detail():
 
         return list_heder, list_object
 
+    def __del__(self):
+        print(datetime.datetime.now(pytz.timezone('Asia/Tokyo')))
+        print('インスタンスを破棄します。')
+        driver.quit()
+
 
 def Scraping(request):
     global list_object
@@ -244,7 +253,6 @@ def Scraping(request):
 
 def Scraping_Find(request, *args, **kwargs):
     global list_object
-    driver.close()
     url = request.GET.get("url")
     b = Item_Detail(url)
 
